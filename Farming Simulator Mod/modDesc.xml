@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modDesc descVersion="64">
+    <!-- Mod identification and general information -->
+    <title>Farming Simulator 25 Live Dashboard</title>
+    <author>Mommers Co</author>
+    <version>1.0.0</version>
+    <description>This mod collects data from Farming Simulator 25 maps and exports it to an external database for live map rendering and weather updates.</description>
+    <url>http://mommersco.com</url>
+    <category>Utility</category>
+
+    <!-- The platforms that the mod supports -->
+    <platform>PC</platform> <!-- You can also add <platform>PS5</platform> and <platform>Xbox</platform> if you plan to release on consoles -->
+
+    <!-- The mod's supported game versions -->
+    <gameVersion>25.0.0</gameVersion>
+
+    <!-- Mod dependency (if needed) -->
+    <!-- <dependencies>
+        <mod name="DependencyModName" minVersion="1.0.0"/>
+    </dependencies> -->
+
+    <!-- Icons for the mod (use the actual file paths for your icon images) -->
+    <icons>
+        <icon size="64x64">icons/icon_64.png</icon>
+        <icon size="128x128">icons/icon_128.png</icon>
+    </icons>
+
+    <!-- Affected vehicle types or objects (if applicable) -->
+    <vehicles>
+        <vehicle type="tractor" name="Tractor Model 1"/>
+    </vehicles>
+
+    <!-- Special mod settings -->
+    <settings>
+        <setting name="dataExportFrequency" type="integer" defaultValue="30" min="1" max="1440">
+            <description>Data export frequency (in minutes)</description>
+        </setting>
+        <setting name="enableWeatherUpdates" type="boolean" defaultValue="true">
+            <description>Enable weather updates</description>
+        </setting>
+    </settings>
+
+    <!-- Mod icon images -->
+    <images>
+        <image size="1920x1080">images/mod_screenshot.jpg</image>
+    </images>
+
+    <!-- Scripts to run when the mod is loaded -->
+    <scripts>
+        <script file="scripts/main.js" />
+    </scripts>
+
+    <!-- The mod's configuration settings, if any -->
+    <config>
+        <file path="config/default.json" />
+        <file path="config/production.json" />
+    </config>
+
+    <!-- A list of items that are included in the mod -->
+    <items>
+        <item name="exportData" description="Exports field data and weather information to the external API" />
+        <item name="weatherUpdate" description="Fetches and displays live weather data from an API" />
+    </items>
+
+    <!-- Additional metadata -->
+    <additionalInfo>
+        <info name="license">MIT License</info>
+        <info name="authorEmail">andrew.mommers@mommersco.com</info>
+    </additionalInfo>
+
+    <!-- Mod's localization support (if applicable) -->
+    <localization>
+        <language code="en">
+            <text name="modDescription">This mod collects data from Farming Simulator 25 maps and exports it to an external database for live map rendering and weather updates.</text>
+        </language>
+        <language code="de">
+            <text name="modDescription">Dieses Mod sammelt Daten von Farming Simulator 25 Karten und exportiert sie in eine externe Datenbank für Live-Karten und Wetteraktualisierungen.</text>
+        </language>
+    </localization>
+</modDesc>
