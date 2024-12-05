@@ -1,0 +1,21 @@
+{
+    "name": "farming-simulator-live-map",
+    "version": "1.0.0",
+    "description": "Farming Simulator Live Map, Calendar, and Weather Integration",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend"
+    ],
+    "scripts": {
+        "start": "npm run start --workspace=backend",
+        "dev": "npm run dev --workspace=backend"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "config": "^3.3.12"
+    }
+}
