@@ -108,4 +108,4 @@ Pull requests are welcome! Please fork the repo and submit your improvements. Di
 
 ## 🤝 Support
 
-Have questions or ideas? Reach out via Issues or Discussions.
+Have questions or ideas? Reach out via Mommers Co Discord
