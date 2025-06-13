@@ -1,5 +1,4 @@
-# No Release Date, at this stage.
-# Still Work in Progress.
+# No Release Date, at this stage: Still Work in Progress.
 
 # 🚜 FS25 Farm Management Portal
 
