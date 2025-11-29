@@ -1,107 +1,85 @@
-# No Release Date, at this stage: Still Work in Progress.
+# FS25 Management Portal: Project AURA (Advanced Unified Resource Analyzer)
 
-# 🚜 FS25 Farm Management Portal
+![Project Status](https://img.shields.io/badge/Status-Prototype-cyan?style=flat-square) ![FS25](https://img.shields.io/badge/Game-Farming%20Simulator%2025-green?style=flat-square) ![Mommers Co](https://img.shields.io/badge/Design-Mommers%20Co-00f3ff?style=flat-square)
 
-A modern web-based portal to manage your **Farming Simulator 25** farm, either for local saves or dedicated servers. Built to work alongside a custom FS25 mod to provide real-time data syncing, insights, and automation inspired by [FarmTrak](https://farmtrak.com.au).
+## 🚀 Overview
 
----
+The **FS25 Management Portal (Project AURA)** is the definitive, next-generation farm management ecosystem for Farming Simulator 25. Built with a futuristic, data-driven aesthetic inspired by **Mommers Co Branding**, AURA transcends traditional modding tools by offering a professional-grade "Command Center" experience.
 
-## 🌾 Project Overview
-
-FS25 Farm Management Portal is a powerful interface that connects with your FS25 game to give you full visibility and control over your farming operations from any web browser.
-
-- 📊 View live stats from your farm
-- 🔧 Manage equipment and schedules
-- 🧠 Plan crops and field treatments
-- 💰 Analyze financial data
-- 🐄 Monitor animal health and productivity
-- 🌐 Supports singleplayer or multiplayer servers
+It connects a high-performance **Lua Game Mod** with a **Modern Web Application** to provide real-time oversight, advanced agronomic planning, and deep financial analysis for both singleplayer and multiplayer servers.
 
 ---
 
-## 🧩 Features
+## 💻 Web Portal: The Management Portal
 
-### 🌐 Web Portal (Panel Side)
+The web interface utilizes a **Modular, Dark-Mode UI** focused on high-contrast data visualization and "kinetic" interactions.
 
-#### 🏠 Dashboard
-- Farm overview: cash, debt, land, income
-- Weather & crop calendar
-- Productivity and efficiency KPIs
+### 1. 🏠 Holo-Dashboard (Farm Management Portal)
+* **Operational Velocity Index (OVI):** A composite score (0-100) reflecting overall farm efficiency, blending time usage, profit margin, and active machine utilization.
+* **Live Financials:** Real-time tracking of cash flow, total debt, and land value with depreciation simulation.
+* **Kinetic Weather:** Integrated forecast timeline showing rain/snow windows relative to crop growth stages.
+* **Priority Alerts:** "Top 5" critical actions (e.g., "Loan Payment Due," "Tractor Fuel < 10%").
 
-#### 🌱 Fields Management
-- Visual map + field list
-- Crop type, growth stages, treatments
-- Contracts & mission tracking
-- Field rotation and planning tools
+### 2. 🗺️ Geospatial Intelligence (GIS Map)
+* **Layered Visualizations:**
+    * **Yield Potential:** Heatmaps based on historical harvest data.
+    * **Soil Composition:** pH, Nitrogen, and moisture levels (simulated from FS25 data).
+    * **Growth Stage:** Real-time crop progress overlay.
+* **Field History:** A permanent log of every liter of seed, fertilizer, and lime applied to specific coordinates.
 
-#### 🚜 Vehicle & Equipment
-- Owned vs leased vehicles
-- Usage hours, maintenance, fuel, repairs
-- GPS tracker support (if mod-enabled)
+### 3. ✅ Operations Kanban & Tasks
+* **Kanban Workflow:** Drag-and-drop tasks between "To Do," "In Progress," and "Done."
+* **Recurring Checklists:** Automated generation of daily tasks (e.g., "Feed Pigs," "Check Greenhouse Water").
+* **Multiplayer Assignment:** Assign tasks to specific users (e.g., "Commander Mommer") or Roles (e.g., "Logistics").
 
-#### 💸 Finance & Economy
-- Profit/loss charts
-- Expense tracking by category
-- Loan management tools
-- Budget planner
+### 4. 📝 Smart Knowledge Hub
+* **Global Scratchpad:** A persistent, quick-access notes widget available on every screen.
+* **Contextual Asset Notes:** Attach permanent maintenance notes to specific tractors (e.g., "Clutch slips in 4th gear") or fields (e.g., "Avoid rock pile in North corner").
+* **Wiki Integration:** Built-in storage for server rules, mod manuals, and crop rotation guides.
 
-#### 🐄 Animal Husbandry
-- Animal counts, feed stats, productivity
-- Feed planner
-- Animal health alerts
-
-#### 🏚 Storage & Inventory
-- Current storage levels (grain, silage, etc.)
-- Pricing estimates and sell tracking
-- Silo status per location
-
-#### 🧩 Mod Support & Config Editor
-- Toggle mods for saves
-- Edit mod `.xml` and vehicle config files
-- File uploader for mods
-
-#### 👥 Multiplayer Sync
-- Sync user data (roles, actions)
-- Role-based access (admin, worker, viewer)
-- Token-based sync per server or save
-
-#### 📢 Alerts & Notifications
-- Field or animal status alerts
-- Vehicle maintenance reminders
-- Email or Discord integration (optional)
-
-#### ⚙️ Settings / Profiles
-- Per-save sync profiles
-- Language and unit preferences
-- Server token + sync frequency
+### 5. 🚜 Fleet & Maintenance
+* **Telematics:** Live engine RPM, fuel levels, and location tracking.
+* **Predictive Maintenance:** Schedules service based on engine hours rather than just generic "damage" percentages.
 
 ---
 
-### 🛠 FS25 Mod (In-Game Mod Integration)
+## 🛠️ Mod Integration (Technical Arch)
 
-> Written in Lua, installed directly in FS25 game/mods folder
+The bridge between FS25 and the Web Portal is built on robust, low-latency protocols.
 
-- Exports field, vehicle, and financial data
-- In-game settings menu for sync setup
-- Optional built-in HTTP server for remote sync
-- File-based sync mode for local saves
-- Supports authentication token
-- Auto snapshot generation
+### 1. The Core Mod (`FS25_AuraConnector`)
+* **Language:** Optimized Lua.
+* **Communication:**
+    * **WebSocket/HTTP Server:** Runs locally within the game client/server to push state changes immediately.
+    * **Fallback Mode:** File-based syncing (XML/JSON) for dedicated servers where port forwarding is restricted.
+* **Security:** Uses a revocable **Bearer Token** system to ensure only authorized web clients can read/write data.
 
----
-
-## 📜 License
-
-MIT License — feel free to use, modify, and contribute.
+### 2. Data Payloads
+* **High Frequency (1Hz):** Vehicle coordinates, fuel, active tool state.
+* **Low Frequency (Event-based):** Silo inventory changes, animal birth/death, field growth transitions, financial transactions.
 
 ---
 
-## 🧪 Contributing
+## 🎨 Design System: "Mommers Co Future"
 
-Pull requests are welcome! Please fork the repo and submit your improvements. Discussions and feedback are also encouraged.
+The UI follows strict design guidelines to ensure a premium feel:
+
+* **Palette:**
+    * Background: Deep Space Blue (`#0b0c15`)
+    * Panels: Glassmorphism (`rgba(19, 21, 31, 0.7)`)
+    * Accents: Cyber Cyan (`#00f3ff`) & Emerald Success (`#00ff9d`)
+* **Typography:** `Rajdhani` for headers (Technical/Sci-Fi), `Inter` for body copy (Readability), `JetBrains Mono` for data (Precision).
+* **Visuals:** Subtle glow effects, holographic borders, and "Glitch" animations on interaction.
 
 ---
 
-## 🤝 Support
+## 📦 Installation (Projected)
 
-Have questions or ideas? Reach out via Mommers Co Discord
+1.  **Install Mod:** Place `FS25_AuraConnector.zip` in your `My Games/FarmingSimulator2025/mods` folder.
+2.  **Launch Game:** Enable the mod on your savegame.
+3.  **Link Account:** Open the in-game menu (Alt + A), generate a **Sync Token**.
+4.  **Connect Web App:** Enter the token on the AURA Web Portal to begin the uplink.
+
+---
+
+*Property of Mommers Co. All Rights Reserved.*

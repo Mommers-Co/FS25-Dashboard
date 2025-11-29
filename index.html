@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FS25 Project AURA | Operations Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Mommers Co / AURA Custom Theme */
+        :root {
+            --aura-bg: #0b0c15;
+            --aura-panel: #13151f;
+            --aura-border: #2a2e3f;
+            --aura-accent: #00f3ff;
+            --aura-accent-dim: rgba(0, 243, 255, 0.1);
+            --aura-success: #00ff9d;
+            --aura-warning: #ffb800;
+            --aura-danger: #ff0055;
+            --aura-text-main: #e2e8f0;
+            --aura-text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--aura-bg);
+            color: var(--aura-text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* App-like feel */
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Glassmorphism & Panel Styles */
+        .glass-panel {
+            background: rgba(19, 21, 31, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--aura-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .holo-border {
+            position: relative;
+            border: 1px solid var(--aura-border);
+            overflow: hidden;
+        }
+        
+        .holo-border::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid transparent;
+            background: linear-gradient(45deg, transparent 95%, var(--aura-accent) 100%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Nav Item Styles */
+        .nav-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: var(--aura-accent-dim);
+            color: var(--aura-accent);
+            border-left: 3px solid var(--aura-accent);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--aura-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--aura-accent);
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px var(--aura-accent-dim); }
+            50% { box-shadow: 0 0 15px var(--aura-accent-dim); }
+        }
+        .animate-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Kanban Styles */
+        .kanban-card {
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .kanban-card:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="h-screen flex text-sm">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass-panel flex flex-col z-20 border-r-0 border-r border-slate-800">
+        <!-- Brand -->
+        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+            <i data-lucide="hexagon" class="text-cyan-400 w-6 h-6 mr-3 animate-glow"></i>
+            <div>
+                <h1 class="text-lg font-bold tracking-widest text-white leading-none">AURA</h1>
+                <span class="text-[10px] text-cyan-400 font-mono tracking-widest">OPS CONSOLE</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-6 space-y-1">
+            <a href="#" onclick="switchView('dashboard')" id="nav-dashboard" class="nav-item active flex items-center px-6 py-3 text-slate-400 group">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                <span class="font-heading font-semibold">Dashboard</span>
+            </a>
+            <a href="#" onclick="switchView('map')" id="nav-map" class="nav-item flex items-center px-6 py-3 text-slate-400 group">
+                <i data-lucide="map" class="w-5 h-5 mr-3"></i>
+                <span class="font-heading font-semibold">Geo-Map</span>
+            </a>
+            <a href="#" onclick="switchView('tasks')" id="nav-tasks" class="nav-item flex items-center px-6 py-3 text-slate-400 group">
+                <i data-lucide="check-square" class="w-5 h-5 mr-3"></i>
+                <span class="font-heading font-semibold">Tasks & Plans</span>
+                <span class="ml-auto bg-cyan-900 text-cyan-400 text-[10px] font-bold px-1.5 py-0.5 rounded">3</span>
+            </a>
+            <a href="#" class="nav-item flex items-center px-6 py-3 text-slate-400 group hover:opacity-50 cursor-not-allowed" title="Not available in preview">
+                <i data-lucide="tractor" class="w-5 h-5 mr-3"></i>
+                <span class="font-heading font-semibold">Fleet</span>
+            </a>
+            <a href="#" class="nav-item flex items-center px-6 py-3 text-slate-400 group hover:opacity-50 cursor-not-allowed" title="Not available in preview">
+                <i data-lucide="piggy-bank" class="w-5 h-5 mr-3"></i>
+                <span class="font-heading font-semibold">Finance</span>
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer (Notes Trigger) -->
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="toggleNotes()" class="w-full flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded border border-slate-700 transition-colors">
+                <i data-lucide="sticky-note" class="w-4 h-4 mr-2"></i>
+                <span class="font-heading font-semibold text-xs">Quick Notes</span>
+            </button>
+            <div class="mt-4 flex items-center justify-between text-xs text-slate-500 font-mono">
+                <span class="flex items-center"><div class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></div> ONLINE</span>
+                <span>v1.1.0</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#1a1f2e] via-[#0b0c15] to-[#0b0c15]">
+        
+        <!-- Header -->
+        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-8 glass-panel z-10">
+            <div class="flex items-center text-slate-400">
+                <i data-lucide="server" class="w-4 h-4 mr-2"></i>
+                <span class="text-xs font-mono">SERVER: ELM_CREEK_DS_01</span>
+                <span class="mx-3 text-slate-700">|</span>
+                <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+                <span class="text-xs font-mono text-cyan-400">GAME TIME: 09:42 AM</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 text-slate-400 hover:text-white transition-colors relative">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
+                </button>
+                <div class="flex items-center pl-4 border-l border-slate-700">
+                    <div class="text-right mr-3 hidden md:block">
+                        <div class="text-xs font-bold text-white">A. Mommers</div>
+                        <div class="text-[10px] text-cyan-500 font-mono">ADMIN</div>
+                    </div>
+                    <div class="w-8 h-8 rounded bg-cyan-900 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
+                        M
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Views Container -->
+        <div id="content-area" class="flex-1 overflow-y-auto p-8 scroll-smooth relative">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="fade-in space-y-6">
+                
+                <!-- Top KPI Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Money -->
+                    <div class="glass-panel p-5 rounded-lg holo-border">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-heading text-slate-400">Available Cash</span>
+                            <i data-lucide="dollar-sign" class="w-4 h-4 text-emerald-400"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-bold text-white mb-1">$ 1,245,300</div>
+                        <div class="text-xs text-emerald-400 flex items-center">
+                            <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +$42k (Harvest)
+                        </div>
+                    </div>
+
+                    <!-- OVI Score -->
+                    <div class="glass-panel p-5 rounded-lg holo-border relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-heading text-slate-400">OVI Score</span>
+                            <i data-lucide="activity" class="w-4 h-4 text-cyan-400"></i>
+                        </div>
+                        <div class="flex items-end">
+                            <div class="text-3xl font-heading font-bold text-cyan-400 leading-none">87</div>
+                            <span class="text-xs text-slate-500 mb-1 ml-1">/ 100</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1 mt-3 rounded-full overflow-hidden">
+                            <div class="bg-cyan-400 h-full rounded-full" style="width: 87%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Machinery -->
+                    <div class="glass-panel p-5 rounded-lg holo-border">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-heading text-slate-400">Active Fleet</span>
+                            <i data-lucide="tractor" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-bold text-white mb-1">4 <span class="text-sm text-slate-500">/ 12</span></div>
+                        <div class="text-xs text-slate-400">
+                            2 Harvesting, 1 Transport, 1 Idle
+                        </div>
+                    </div>
+
+                    <!-- Weather -->
+                    <div class="glass-panel p-5 rounded-lg holo-border">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-heading text-slate-400">Forecast</span>
+                            <i data-lucide="cloud-rain" class="w-4 h-4 text-blue-400"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-xl font-bold text-white">Rain</div>
+                                <div class="text-xs text-blue-400">Starts in 2h 15m</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-mono text-slate-300">18°C</div>
+                                <div class="text-[10px] text-slate-500">WIND: 12km/h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Middle Column: Field Status -->
+                    <div class="lg:col-span-2 glass-panel rounded-lg p-6 holo-border">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-heading font-bold text-white flex items-center">
+                                <i data-lucide="map" class="w-4 h-4 text-cyan-400 mr-2"></i> Field Operations
+                            </h3>
+                            <button onclick="switchView('map')" class="text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-900 bg-cyan-900/20 px-3 py-1 rounded transition-colors">
+                                View Full Map
+                            </button>
+                        </div>
+                        
+                        <!-- Simple Field List for Dashboard -->
+                        <div class="space-y-3">
+                            <!-- Field Item -->
+                            <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50 flex items-center justify-between hover:border-slate-600 transition-colors cursor-pointer">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded bg-amber-900/30 text-amber-500 flex items-center justify-center font-bold text-xs border border-amber-500/20 mr-3">
+                                        F7
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-200">Corn <span class="text-[10px] text-slate-500 font-normal ml-2">4.2 Ha</span></div>
+                                        <div class="text-xs text-amber-400">Ready to Harvest</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-right hidden sm:block">
+                                        <div class="text-[10px] text-slate-500 uppercase">Yield Est.</div>
+                                        <div class="text-xs font-mono text-slate-300">42,000 L</div>
+                                    </div>
+                                    <div class="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="bg-amber-500 h-full w-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Field Item -->
+                            <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50 flex items-center justify-between hover:border-slate-600 transition-colors cursor-pointer">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded bg-emerald-900/30 text-emerald-500 flex items-center justify-center font-bold text-xs border border-emerald-500/20 mr-3">
+                                        F12
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-200">Grass <span class="text-[10px] text-slate-500 font-normal ml-2">1.8 Ha</span></div>
+                                        <div class="text-xs text-emerald-400">Growing (Stage 2/3)</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-right hidden sm:block">
+                                        <div class="text-[10px] text-slate-500 uppercase">Fertilized</div>
+                                        <div class="text-xs font-mono text-slate-300">100%</div>
+                                    </div>
+                                    <div class="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="bg-emerald-500 h-full w-[65%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Field Item -->
+                            <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50 flex items-center justify-between hover:border-slate-600 transition-colors cursor-pointer">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded bg-indigo-900/30 text-indigo-500 flex items-center justify-center font-bold text-xs border border-indigo-500/20 mr-3">
+                                        F4
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-200">Empty <span class="text-[10px] text-slate-500 font-normal ml-2">6.5 Ha</span></div>
+                                        <div class="text-xs text-slate-400">Needs Plowing</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <button class="text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded">
+                                        Plan Crop
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Alerts & Quick Tasks -->
+                    <div class="space-y-6">
+                        
+                        <!-- Alerts -->
+                        <div class="glass-panel rounded-lg p-6 holo-border border-l-4 border-l-rose-500">
+                            <h3 class="text-sm font-heading font-bold text-white mb-4 uppercase tracking-wider">Priority Alerts</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start space-x-3 text-sm">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500 mt-0.5 shrink-0"></i>
+                                    <div>
+                                        <div class="text-slate-200 font-medium">Loan Payment Due</div>
+                                        <div class="text-xs text-slate-500">Tomorrow at 09:00 ($15,000)</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3 text-sm">
+                                    <i data-lucide="droplet" class="w-4 h-4 text-amber-500 mt-0.5 shrink-0"></i>
+                                    <div>
+                                        <div class="text-slate-200 font-medium">Diesel Low: John Deere 8R</div>
+                                        <div class="text-xs text-slate-500">12% Remaining</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Task List -->
+                        <div class="glass-panel rounded-lg p-6 holo-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-heading font-bold text-white uppercase tracking-wider">My Tasks</h3>
+                                <span class="text-[10px] bg-slate-700 px-1.5 rounded text-slate-300">3 Pending</span>
+                            </div>
+                            <ul class="space-y-2">
+                                <li class="flex items-center text-sm text-slate-300">
+                                    <input type="checkbox" class="mr-2 accent-cyan-500 bg-slate-800 border-slate-600 rounded">
+                                    <span class="line-through decoration-slate-500 text-slate-500">Check Cows</span>
+                                </li>
+                                <li class="flex items-center text-sm text-slate-300">
+                                    <input type="checkbox" class="mr-2 accent-cyan-500 bg-slate-800 border-slate-600 rounded">
+                                    <span>Harvest Field 7</span>
+                                </li>
+                                <li class="flex items-center text-sm text-slate-300">
+                                    <input type="checkbox" class="mr-2 accent-cyan-500 bg-slate-800 border-slate-600 rounded">
+                                    <span>Buy Lime Pallets</span>
+                                </li>
+                            </ul>
+                            <button onclick="switchView('tasks')" class="w-full mt-4 py-2 border border-slate-700 rounded text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+                                Open Kanban Board
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MAP -->
+            <div id="view-map" class="hidden h-full flex flex-col fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-heading text-white">Geospatial Intelligence</h2>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1.5 text-xs font-bold bg-cyan-600 text-white rounded shadow-lg shadow-cyan-500/20">Yield Map</button>
+                        <button class="px-3 py-1.5 text-xs font-bold bg-slate-700 text-slate-300 hover:text-white rounded">Soil Comp.</button>
+                        <button class="px-3 py-1.5 text-xs font-bold bg-slate-700 text-slate-300 hover:text-white rounded">Growth</button>
+                    </div>
+                </div>
+                <div class="flex-1 glass-panel rounded-lg holo-border relative overflow-hidden bg-[#0f111a]">
+                    <!-- Canvas for Drawing Map -->
+                    <canvas id="mapCanvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- Map Overlay Controls -->
+                    <div class="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur p-3 rounded border border-slate-700 text-xs text-slate-300">
+                        <div class="font-bold text-white mb-2">Legend</div>
+                        <div class="flex items-center mb-1"><span class="w-3 h-3 bg-amber-500/50 border border-amber-500 mr-2"></span> Ready to Harvest</div>
+                        <div class="flex items-center mb-1"><span class="w-3 h-3 bg-emerald-500/50 border border-emerald-500 mr-2"></span> Growing</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-indigo-500/50 border border-indigo-500 mr-2"></span> Needs Plowing</div>
+                    </div>
+                    
+                    <!-- Vehicle Marker (Simulated) -->
+                    <div class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <i data-lucide="tractor" class="w-6 h-6 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"></i>
+                        <span class="text-[10px] bg-black/70 px-1 rounded text-white mt-1">JD 8R</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TASKS (KANBAN) -->
+            <div id="view-tasks" class="hidden h-full flex flex-col fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-heading text-white">Operations Kanban</h2>
+                        <p class="text-slate-500 text-xs">Manage farm workflow and assignments.</p>
+                    </div>
+                    <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded text-xs font-bold flex items-center shadow-lg shadow-cyan-500/20">
+                        <i data-lucide="plus" class="w-3 h-3 mr-2"></i> New Task
+                    </button>
+                </div>
+
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
+                    
+                    <!-- Col: To Do -->
+                    <div class="flex flex-col h-full bg-slate-900/30 rounded-lg border border-slate-800">
+                        <div class="p-3 border-b border-slate-800 flex justify-between items-center">
+                            <span class="font-heading font-bold text-slate-400 text-sm uppercase tracking-wider">To Do</span>
+                            <span class="bg-slate-800 text-slate-400 text-[10px] px-1.5 rounded">2</span>
+                        </div>
+                        <div class="p-3 space-y-3 overflow-y-auto flex-1 custom-scrollbar">
+                            <!-- Card -->
+                            <div class="kanban-card glass-panel p-3 rounded border-l-2 border-l-slate-500 hover:bg-slate-800/80">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-bold text-slate-200">Buy 2000L Herbicide</span>
+                                    <i data-lucide="more-horizontal" class="w-3 h-3 text-slate-500 cursor-pointer"></i>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mb-3">Shop run needed before planting F4.</p>
+                                <div class="flex justify-between items-center">
+                                    <div class="w-6 h-6 rounded-full bg-purple-900 text-purple-300 text-[10px] flex items-center justify-center border border-purple-500/30">JD</div>
+                                    <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">Logistics</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Card -->
+                            <div class="kanban-card glass-panel p-3 rounded border-l-2 border-l-indigo-500 hover:bg-slate-800/80">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-bold text-slate-200">Plow Field 4</span>
+                                    <i data-lucide="more-horizontal" class="w-3 h-3 text-slate-500 cursor-pointer"></i>
+                                </div>
+                                <div class="flex items-center text-[10px] text-indigo-400 mb-3 bg-indigo-900/20 w-fit px-1.5 py-0.5 rounded">
+                                    <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i> Field 4
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 text-[10px] flex items-center justify-center border border-slate-500/30">?</div>
+                                    <span class="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">Fieldwork</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Col: In Progress -->
+                    <div class="flex flex-col h-full bg-slate-900/30 rounded-lg border border-slate-800">
+                        <div class="p-3 border-b border-slate-800 flex justify-between items-center">
+                            <span class="font-heading font-bold text-cyan-400 text-sm uppercase tracking-wider">In Progress</span>
+                            <span class="bg-cyan-900/30 text-cyan-400 text-[10px] px-1.5 rounded">1</span>
+                        </div>
+                        <div class="p-3 space-y-3 overflow-y-auto flex-1 custom-scrollbar">
+                            <!-- Card -->
+                            <div class="kanban-card glass-panel p-3 rounded border-l-2 border-l-amber-500 hover:bg-slate-800/80 shadow-[0_0_10px_rgba(245,158,11,0.1)]">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-bold text-white">Harvest Field 7</span>
+                                    <i data-lucide="loader" class="w-3 h-3 text-amber-500 animate-spin"></i>
+                                </div>
+                                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+                                    <div class="bg-amber-500 h-full w-[45%]"></div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="w-6 h-6 rounded-full bg-cyan-900 text-cyan-300 text-[10px] flex items-center justify-center border border-cyan-500/30" title="Cmdr. Mommer">M</div>
+                                    <span class="text-[10px] text-amber-400 bg-amber-900/20 px-1.5 py-0.5 rounded">High Priority</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Col: Done -->
+                    <div class="flex flex-col h-full bg-slate-900/30 rounded-lg border border-slate-800">
+                        <div class="p-3 border-b border-slate-800 flex justify-between items-center">
+                            <span class="font-heading font-bold text-emerald-500 text-sm uppercase tracking-wider">Completed</span>
+                            <span class="bg-emerald-900/30 text-emerald-400 text-[10px] px-1.5 rounded">5</span>
+                        </div>
+                        <div class="p-3 space-y-3 overflow-y-auto flex-1 custom-scrollbar">
+                            <!-- Card -->
+                            <div class="kanban-card glass-panel p-3 rounded opacity-60 hover:opacity-100 transition-opacity">
+                                <span class="text-xs font-bold text-slate-400 line-through">Feed Cows (TMR)</span>
+                                <div class="flex justify-end mt-2">
+                                    <i data-lucide="check-circle" class="w-3 h-3 text-emerald-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sticky Notes Widget (Hidden by default) -->
+        <div id="notes-widget" class="absolute bottom-6 left-6 w-80 glass-panel border border-cyan-500/30 rounded-lg shadow-2xl transform translate-y-[120%] transition-transform duration-300 z-50 flex flex-col h-96">
+            <div class="p-3 bg-slate-900/80 border-b border-slate-800 flex justify-between items-center rounded-t-lg">
+                <span class="text-xs font-heading font-bold text-cyan-400 flex items-center">
+                    <i data-lucide="edit-3" class="w-3 h-3 mr-2"></i> QUICK NOTES
+                </span>
+                <button onclick="toggleNotes()" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <textarea class="flex-1 bg-transparent border-none p-4 text-xs font-mono text-slate-300 resize-none focus:ring-0 outline-none" placeholder="Type reminders, coords, or thoughts here...
+- Check price of Wheat
+- Tractor 3 making weird noise"></textarea>
+            <div class="p-2 border-t border-slate-800 flex justify-between items-center bg-slate-900/50 rounded-b-lg">
+                <span class="text-[10px] text-slate-600">Auto-saved</span>
+                <button class="text-[10px] text-cyan-400 hover:text-white px-2">Clear</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // View Switching Logic
+        function switchView(viewName) {
+            // Hide all views
+            ['dashboard', 'map', 'tasks'].forEach(v => {
+                document.getElementById('view-' + v).classList.add('hidden');
+                document.getElementById('nav-' + v).classList.remove('active');
+                document.getElementById('nav-' + v).classList.remove('text-cyan-400');
+                document.getElementById('nav-' + v).classList.add('text-slate-400');
+            });
+
+            // Show selected view
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            
+            // Update Nav State
+            const activeNav = document.getElementById('nav-' + viewName);
+            activeNav.classList.add('active');
+            activeNav.classList.remove('text-slate-400');
+            activeNav.classList.add('text-cyan-400');
+
+            // Trigger canvas redraw if map is selected
+            if(viewName === 'map') {
+                setTimeout(drawMap, 50);
+            }
+        }
+
+        // Notes Toggle
+        function toggleNotes() {
+            const widget = document.getElementById('notes-widget');
+            if (widget.style.transform === 'translateY(0px)') {
+                widget.style.transform = 'translateY(120%)';
+            } else {
+                widget.style.transform = 'translateY(0px)';
+            }
+        }
+
+        // Canvas Map Drawing (Mock)
+        function drawMap() {
+            const canvas = document.getElementById('mapCanvas');
+            const parent = canvas.parentElement;
+            
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Clear
+            ctx.fillStyle = '#0f111a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for(let i=0; i<canvas.height; i+=40) {
+                ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Draw Fields
+            function drawPoly(points, color, label) {
+                ctx.fillStyle = color;
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                ctx.moveTo(points[0][0], points[0][1]);
+                for(let i=1; i<points.length; i++) {
+                    ctx.lineTo(points[i][0], points[i][1]);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Inter';
+                ctx.fillText(label, points[0][0] + 20, points[0][1] + 20);
+            }
+
+            // Field 7 (Harvest Ready - Amber)
+            drawPoly([[100,100], [300,100], [320, 250], [120, 280]], 'rgba(245, 158, 11, 0.2)', 'F7');
+            
+            // Field 12 (Growing - Emerald)
+            drawPoly([[400,50], [600,80], [580, 200], [420, 180]], 'rgba(16, 185, 129, 0.2)', 'F12');
+
+            // Field 4 (Empty - Indigo)
+            drawPoly([[150,350], [400,320], [450, 500], [100, 480]], 'rgba(99, 102, 241, 0.2)', 'F4');
+        }
+
+        // Initial Map Draw
+        window.addEventListener('resize', () => {
+            if(!document.getElementById('view-map').classList.contains('hidden')) {
+                drawMap();
+            }
+        });
+    </script>
+</body>
+</html>
