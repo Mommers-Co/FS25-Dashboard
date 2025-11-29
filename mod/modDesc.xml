@@ -1,0 +1,15 @@
+<modDesc descVersion="70">
+    <title>FS25 Farm Management Sync</title>
+    <description>Exports FS25 data for sync with Web Panel</description>
+    <author>Mommers Co</author>
+    <version>1.0.0</version>
+    <scriptFiles>
+        <script file="FS25_FarmManagement.lua"/>
+        <script file="config.lua"/>
+        <script file="http_sync.lua"/>
+        <script file="file_sync.lua"/>
+    </scriptFiles>
+    <l10n>
+        <text name="mod_name">Farm Management Sync</text>
+    </l10n>
+</modDesc>
