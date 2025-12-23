@@ -1,4 +1,4 @@
-# FS25 Management Portal: Project AURA (Advanced Unified Resource Analyzer)
+# FS25 Management Portal: Project AURA (Advanced Unified Resource Analyzer) - [W.I.P]
 
 ![Project Status](https://img.shields.io/badge/Status-Prototype-cyan?style=flat-square) ![FS25](https://img.shields.io/badge/Game-Farming%20Simulator%2025-green?style=flat-square) ![Mommers Co](https://img.shields.io/badge/Design-Mommers%20Co-00f3ff?style=flat-square)
 
